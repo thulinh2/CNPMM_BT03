@@ -1,5 +1,6 @@
 import { Outlet } from "react-router-dom";
 import Header from "./components/layout/header";
+import Footer from "./components/layout/footer";
 import axios from "./util/axios.customize";
 import { useContext, useEffect } from "react";
 import { AuthContext } from "./components/context/auth.context";
@@ -28,7 +29,7 @@ function App() {
     }, [])
 
     return (
-        <div>
+        <div className="flex flex-col min-h-screen">
             {appLoading === true ?
                 <div style={{
                     position: "fixed",
@@ -41,11 +42,14 @@ function App() {
                 :
                 <>
                     <Header />
-                    <Outlet />
+                    <main className="flex-grow bg-slate-50">
+                        <Outlet />
+                    </main>
+                    <Footer />
                 </>
             }
         </div>
     )
 }
 
-export default App
+export default App;
