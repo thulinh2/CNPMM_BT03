@@ -22,7 +22,24 @@ const getUserApi = () => {
     const URL_API = "/v1/api/user";
     return axios.get(URL_API)
 }
+// ================= API CHO ADMIN QUẢN LÝ ĐƠN HÀNG =================
+
+const getOrdersAdminApi = () => {
+    const URL_API = "/v1/api/admin/orders";
+    return axios.get(URL_API);
+};
+
+const updateOrderStatusApi = (orderId, status, note) => {
+    const URL_API = `/v1/api/admin/orders/${orderId}/status`;
+    return axios.put(URL_API, { status, note });
+};
+
+const handleCancelRequestApi = (orderId, isApproved, note) => {
+    const URL_API = `/v1/api/admin/orders/${orderId}/cancel-request`;
+    return axios.put(URL_API, { isApproved, note });
+};
+
 
 export {
-    createUserApi, loginApi, getUserApi
+    createUserApi, loginApi, getUserApi, getOrdersAdminApi, updateOrderStatusApi, handleCancelRequestApi
 }

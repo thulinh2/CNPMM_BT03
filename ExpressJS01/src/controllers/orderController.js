@@ -187,6 +187,7 @@ const getOrderDetail = async (req, res) => {
 };
 
 // 5. Hủy đơn hàng (Đã loại bỏ cơ chế trả lại voucher khi đơn bị hủy)
+// 5. Hủy đơn hàng (Đã sửa lại logic thời gian 30 phút)
 const cancelOrder = async (req, res) => {
     try {
         const orderId = req.params.id;
@@ -195,9 +196,18 @@ const cancelOrder = async (req, res) => {
         if (!order) return res.status(404).json({ errCode: 1, message: "Không tìm thấy đơn hàng!" });
 
         const diffInMinutes = (new Date() - new Date(order.createdAt)) / (1000 * 60);
-        if (diffInMinutes > 30) return res.status(400).json({ errCode: 1, message: "Đã quá 30 phút, không thể hủy." });
 
+        // Trường hợp 1: Khách tự hủy trực tiếp (Chỉ áp dụng khi đơn Mới / Đã xác nhận)
         if (order.status === 'New' || order.status === 'Confirmed') {
+            
+            // CHỐT CHẶN: Chỉ ở trường hợp tự hủy này mới bị ràng buộc 30 phút
+            if (diffInMinutes > 30) {
+                return res.status(400).json({ 
+                    errCode: 1, 
+                    message: "Đã quá 30 phút kể từ lúc đặt, không thể tự hủy. Vui lòng liên hệ Shop!" 
+                });
+            }
+
             order.status = 'Cancelled';
             order.cancelReason = cancelReason || 'Khách hàng tự hủy';
             order.statusHistory.push({ status: 'Cancelled', note: `Khách hàng hủy đơn (${cancelReason})` });
@@ -207,18 +217,99 @@ const cancelOrder = async (req, res) => {
                 await Product.findByIdAndUpdate(item.productId, { $inc: { stock: item.quantity, sold: -item.quantity } });
             }
 
-
             await order.save();
             return res.status(200).json({ errCode: 0, message: "Hủy đơn hàng thành công!", data: order });
-        } else if (order.status === 'Preparing') {
+            
+        } 
+        // Trường hợp 2: Khách GỬI YÊU CẦU hủy (Áp dụng khi shop đang đóng gói - Bỏ qua thời gian 30p)
+        else if (order.status === 'Preparing') {
             order.status = 'Cancel_Requested';
             order.cancelReason = cancelReason || 'Khách hàng yêu cầu hủy';
             order.statusHistory.push({ status: 'Cancel_Requested', note: `Yêu cầu hủy (${cancelReason})` });
+            
             await order.save();
-            return res.status(200).json({ errCode: 0, message: "Đã gửi yêu cầu hủy đơn!", data: order });
-        } else {
-            return res.status(400).json({ errCode: 1, message: "Không thể hủy đơn hàng này." });
+            return res.status(200).json({ errCode: 0, message: "Đã gửi yêu cầu hủy đơn thành công!", data: order });
+            
+        } 
+        // Trường hợp 3: Đang giao hoặc đã giao thì cấm hủy
+        else {
+            return res.status(400).json({ errCode: 1, message: "Đơn hàng đang giao, không thể hủy." });
         }
+    } catch (error) {
+        return res.status(500).json({ errCode: -1, message: "Lỗi Server" });
+    }
+};
+// ================= CÁC HÀM DÀNH CHO ADMIN QUẢN LÝ ĐƠN HÀNG =================
+
+// 6. Lấy toàn bộ danh sách đơn hàng cho Admin
+const getAllOrdersAdmin = async (req, res) => {
+    try {
+        const orders = await Order.find()
+            .populate('userId', 'name email') // Lấy thêm tên và email khách hàng để hiển thị
+            .sort({ createdAt: -1 });
+        return res.status(200).json({ errCode: 0, data: orders });
+    } catch (error) {
+        console.error("Lỗi lấy danh sách đơn hàng Admin:", error);
+        return res.status(500).json({ errCode: -1, message: "Lỗi Server" });
+    }
+};
+
+// 7. Cập nhật trạng thái đơn hàng (Tiến trình 6 bước)
+const updateOrderStatus = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status, note } = req.body;
+        
+        const order = await Order.findById(id);
+        if (!order) return res.status(404).json({ errCode: 1, message: "Không tìm thấy đơn hàng!" });
+
+        // Nếu Admin chủ động chuyển đơn sang Hủy (Cancelled) từ các trạng thái khác
+        if (status === 'Cancelled' && order.status !== 'Cancelled' && order.status !== 'Cancel_Requested') {
+            for (const item of order.items) {
+                await Product.findByIdAndUpdate(item.productId, { $inc: { stock: item.quantity, sold: -item.quantity } });
+            }
+        }
+
+        order.status = status;
+        order.statusHistory.push({ status: status, note: note || `Admin cập nhật trạng thái thành: ${status}` });
+        await order.save();
+
+        return res.status(200).json({ errCode: 0, message: "Cập nhật trạng thái thành công!", data: order });
+    } catch (error) {
+        return res.status(500).json({ errCode: -1, message: "Lỗi Server" });
+    }
+};
+
+// 8. Xử lý yêu cầu hủy đơn từ khách hàng (khi đơn đang ở Preparing)
+const handleCancelRequest = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { isApproved, note } = req.body; // isApproved nhận true (Đồng ý) hoặc false (Từ chối)
+
+        const order = await Order.findById(id);
+        if (!order) return res.status(404).json({ errCode: 1, message: "Không tìm thấy đơn hàng!" });
+
+        if (order.status !== 'Cancel_Requested') {
+            return res.status(400).json({ errCode: 1, message: "Đơn hàng không có yêu cầu hủy!" });
+        }
+
+        if (isApproved) {
+            // Admin đồng ý hủy: Chuyển sang Cancelled và hoàn lại kho
+            order.status = 'Cancelled';
+            order.statusHistory.push({ status: 'Cancelled', note: note || 'Shop đã đồng ý yêu cầu hủy đơn' });
+            
+            for (const item of order.items) {
+                await Product.findByIdAndUpdate(item.productId, { $inc: { stock: item.quantity, sold: -item.quantity } });
+            }
+        } else {
+            // Admin từ chối hủy: Quay lại trạng thái Shop đang chuẩn bị hàng
+            order.status = 'Preparing';
+            order.cancelReason = ''; 
+            order.statusHistory.push({ status: 'Preparing', note: note || 'Shop từ chối hủy, đơn hàng đang được đóng gói' });
+        }
+
+        await order.save();
+        return res.status(200).json({ errCode: 0, message: "Xử lý yêu cầu thành công!", data: order });
     } catch (error) {
         return res.status(500).json({ errCode: -1, message: "Lỗi Server" });
     }
@@ -229,5 +320,8 @@ module.exports = {
     placeOrder,
     getUserOrders,
     getOrderDetail,
-    cancelOrder
+    cancelOrder,
+    getAllOrdersAdmin, 
+    updateOrderStatus, 
+    handleCancelRequest
 };

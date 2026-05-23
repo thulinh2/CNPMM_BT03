@@ -1,9 +1,11 @@
 const express = require('express');
 const { createUser, handleLogin, getUser, getAccount } = require('../controllers/userController');
+const { updateRole, toggleLockUser, deleteUser } = require('../controllers/userController');
 const { getProducts, getProductById, getTopSellers, getCategories } = require('../controllers/productController');
 const { addToCart, getCart, updateCartQuantity, deleteCartItem } = require('../controllers/cartController');
-const { checkVoucher, placeOrder, getUserOrders, getOrderDetail, cancelOrder } = require('../controllers/orderController');
+const { checkVoucher, placeOrder, getUserOrders, getOrderDetail, cancelOrder, getAllOrdersAdmin, updateOrderStatus, handleCancelRequest } = require('../controllers/orderController');
 const auth = require('../middleware/auth');
+const adminAuth = require('../middleware/adminAuth');
 const delay = require('../middleware/delay');
 const Product = require('../models/product');
 
@@ -55,5 +57,16 @@ routerAPI.get("/orders", getUserOrders);
 routerAPI.get("/order/:id", getOrderDetail);      
 routerAPI.put("/order/:id/cancel", cancelOrder);
 routerAPI.post("/voucher/check", checkVoucher);
+
+// --- CÁC ROUTE CHỈ DÀNH CHO ADMIN QUẢN LÝ USER ---
+routerAPI.put("/users/:id/role", adminAuth, updateRole);
+routerAPI.put("/users/:id/lock", adminAuth, toggleLockUser);
+routerAPI.delete("/users/:id", adminAuth, deleteUser);
+// --- CÁC ROUTE CHỈ DÀNH CHO ADMIN QUẢN LÝ ĐƠN HÀNG ---
+routerAPI.get("/admin/orders", adminAuth, getAllOrdersAdmin);
+routerAPI.put("/admin/orders/:id/status", adminAuth, updateOrderStatus);
+routerAPI.put("/admin/orders/:id/cancel-request", adminAuth, handleCancelRequest);
+
+
 
 module.exports = routerAPI;

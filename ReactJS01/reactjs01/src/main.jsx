@@ -8,29 +8,27 @@ import {
     RouterProvider,
 } from "react-router-dom";
 import RegisterPage from './pages/register.jsx';
-import UserPage from './pages/user.jsx';
+import UserPage from './pages/user.jsx'; 
 import HomePage from './pages/home.jsx';
 import LoginPage from './pages/login.jsx';
 import ProductPage from './pages/product.jsx'; 
 import CartPage from './pages/cart.jsx';
 import OrdersPage from './pages/orders.jsx';
 import OrderDetailPage from './pages/orderDetail.jsx';
-// Import trang Checkout mới
+import AdminLayout from './components/layout/adminLayout';
 import CheckoutPage from './pages/checkout.jsx';
+import AdminOrdersPage from './pages/adminOrders.jsx';
 import { AuthWrapper } from './components/context/auth.context.jsx';
 
 const router = createBrowserRouter([
     {
+        // KHỐI GIAO DIỆN DÀNH CHO KHÁCH HÀNG (Đã xóa trang User khỏi đây)
         path: "/",
         element: <App />,
         children: [
             {
                 index: true,
                 element: <HomePage />
-            },
-            {
-                path: "user",
-                element: <UserPage />
             },
             {
                 path: "product/:id",
@@ -40,7 +38,6 @@ const router = createBrowserRouter([
                 path: "cart",
                 element: <CartPage />
             },
-            // Thêm đường dẫn cho trang Thanh toán
             {
                 path: "checkout",
                 element: <CheckoutPage />
@@ -63,6 +60,22 @@ const router = createBrowserRouter([
         path: "login",
         element: <LoginPage />
     },
+    {
+        // KHỐI GIAO DIỆN DÀNH CHO ADMIN
+        path: "/admin",
+        element: <AdminLayout />,
+        children: [
+            {
+                index: true, 
+                element: <AdminOrdersPage />
+            },
+            {
+                // ĐÃ GẮN GIAO DIỆN QUẢN LÝ NGƯỜI DÙNG VÀO ĐÂY
+                path: "users",
+                element: <UserPage /> 
+            }
+        ]
+    }
 ]);
 
 ReactDOM.createRoot(document.getElementById('root')).render(

@@ -3,3 +3,9 @@
 margin: 0;
 padding: 0;
 }
+/* Làm hàng tiêu đề bảng nổi bật */
+.ant-table-thead > tr > th {
+    background-color: #f3f4f6 !important; /* Màu xám nhạt */
+    color: #1f2937 !important;           /* Màu chữ đậm */
+    font-weight: 700 !important;         /* In đậm */
+}

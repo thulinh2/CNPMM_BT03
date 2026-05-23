@@ -17,21 +17,31 @@ const LoginPage = () => {
         if (res && res.EC === 0) {
             localStorage.setItem("access_token", res.access_token)
             notification.success({
-                message: "LOGIN USER",
-                description: "Success"
+                message: "Đăng nhập thành công",
+                description: "Chào mừng bạn quay trở lại!"
             });
+            
+            // 1. Cập nhật thêm thuộc tính role vào AuthContext
             setAuth({
                 isAuthenticated: true,
                 user: {
                     email: res?.user?.email ?? "",
-                    name: res?.user?.name ?? ""
+                    name: res?.user?.name ?? "",
+                    role: res?.user?.role ?? "USER" // Lưu thêm quyền để Frontend phân biệt
                 }
             })
-            navigate("/");
+            
+            // 2. CHỐT CHẶN CHUYỂN HƯỚNG TỰ ĐỘNG
+            if (res?.user?.role === "ADMIN") {
+                navigate("/admin"); // Nếu là Admin thì đẩy thẳng vào trang Quản trị
+            } else {
+                navigate("/"); // Người dùng bình thường thì cho ra trang chủ mua hàng
+            }
+            
         } else {
             notification.error({
-                message: "LOGIN USER",
-                description: res?.EM ?? "error"
+                message: "Lỗi đăng nhập",
+                description: res?.EM ?? "Thông tin không chính xác"
             })
         }
     };
@@ -58,7 +68,7 @@ const LoginPage = () => {
                             rules={[
                                 {
                                     required: true,
-                                    message: 'Please input your email!',
+                                    message: 'Vui lòng nhập email!',
                                 },
                             ]}
                         >
@@ -71,7 +81,7 @@ const LoginPage = () => {
                             rules={[
                                 {
                                     required: true,
-                                    message: 'Please input your password!',
+                                    message: 'Vui lòng nhập mật khẩu!',
                                 },
                             ]}
                         >
