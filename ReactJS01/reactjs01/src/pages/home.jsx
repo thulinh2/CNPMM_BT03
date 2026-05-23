@@ -118,7 +118,7 @@ const HomePage = () => {
                             <span className="bg-pink-500 w-1.5 h-5 rounded-full inline-block"></span>
                             Danh Mục Sản Phẩm
                         </h3>
-                        <ul className="space-y-1">
+                        <ul className=" space-y-1">
                             {categories.map((cat, index) => (
                                 <li key={index}>
                                     <button 

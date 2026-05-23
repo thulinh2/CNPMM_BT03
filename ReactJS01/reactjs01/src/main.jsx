@@ -12,6 +12,11 @@ import UserPage from './pages/user.jsx';
 import HomePage from './pages/home.jsx';
 import LoginPage from './pages/login.jsx';
 import ProductPage from './pages/product.jsx'; 
+import CartPage from './pages/cart.jsx';
+import OrdersPage from './pages/orders.jsx';
+import OrderDetailPage from './pages/orderDetail.jsx';
+// Import trang Checkout mới
+import CheckoutPage from './pages/checkout.jsx';
 import { AuthWrapper } from './components/context/auth.context.jsx';
 
 const router = createBrowserRouter([
@@ -30,6 +35,23 @@ const router = createBrowserRouter([
             {
                 path: "product/:id",
                 element: <ProductPage />
+            },
+            {
+                path: "cart",
+                element: <CartPage />
+            },
+            // Thêm đường dẫn cho trang Thanh toán
+            {
+                path: "checkout",
+                element: <CheckoutPage />
+            },
+            {
+                path: "orders",
+                element: <OrdersPage />
+            },
+            {
+                path: "order/:id",
+                element: <OrderDetailPage />
             }
         ]
     },

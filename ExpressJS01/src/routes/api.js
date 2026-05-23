@@ -1,6 +1,8 @@
 const express = require('express');
 const { createUser, handleLogin, getUser, getAccount } = require('../controllers/userController');
 const { getProducts, getProductById, getTopSellers, getCategories } = require('../controllers/productController');
+const { addToCart, getCart, updateCartQuantity, deleteCartItem } = require('../controllers/cartController');
+const { checkVoucher, placeOrder, getUserOrders, getOrderDetail, cancelOrder } = require('../controllers/orderController');
 const auth = require('../middleware/auth');
 const delay = require('../middleware/delay');
 const Product = require('../models/product');
@@ -42,5 +44,16 @@ routerAPI.use(auth); // Các route nào nằm dưới dòng này đều sẽ b�
 // Bắt buộc phải đăng nhập
 routerAPI.get("/user", getUser);
 routerAPI.get("/account", delay, getAccount);
+
+routerAPI.post("/cart", addToCart);
+routerAPI.get("/cart", getCart); // Sửa lại route này bỏ cái :userEmail đi cho đồng bộ bảo mật qua token luôn nhé
+routerAPI.put("/cart", updateCartQuantity); // API cập nhật số lượng
+routerAPI.delete("/cart/:productId", deleteCartItem); // API xóa sản phẩm
+
+routerAPI.post("/order", placeOrder);
+routerAPI.get("/orders", getUserOrders);    
+routerAPI.get("/order/:id", getOrderDetail);      
+routerAPI.put("/order/:id/cancel", cancelOrder);
+routerAPI.post("/voucher/check", checkVoucher);
 
 module.exports = routerAPI;

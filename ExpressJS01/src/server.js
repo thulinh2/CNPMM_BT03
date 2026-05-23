@@ -8,6 +8,7 @@ const cors = require('cors');
 
 const Product = require('./models/product');
 const Category = require('./models/category');
+const Voucher = require('./models/voucher');
 
 const app = express(); 
 const port = process.env.PORT || 8080;
@@ -121,6 +122,20 @@ app.use('/v1/api/', apiRoutes);
             console.log(">>> Nạp dữ liệu mẫu thành công!");
         } else {
             console.log(`>>> Database đã có sẵn ${count} sản phẩm.`);
+        }
+        const countVoucher = await Voucher.countDocuments();
+        if (countVoucher === 0) {
+            console.log(">>> Database chưa có Voucher. Đang tự động nạp...");
+            const d = new Date();
+            const nextMonth = new Date(d.setMonth(d.getMonth() + 1)); // Hạn sử dụng: 1 tháng kể từ hôm nay
+            const mockVouchers = [
+                { code: 'GIAM50K', discountType: 'FIXED', discountValue: 50000, minOrderValue: 200000, endDate: nextMonth, usageLimit: 100 },
+                { code: 'SALE10', discountType: 'PERCENT', discountValue: 10, maxDiscountAmount: 100000, minOrderValue: 500000, endDate: nextMonth, usageLimit: 50 }
+            ];
+            await Voucher.insertMany(mockVouchers);
+            console.log(">>> Nạp Voucher mẫu thành công!");
+        } else {
+            console.log(`>>> Database đã có sẵn ${countVoucher} voucher.`);
         }
 
         app.listen(port, () => {
