@@ -8,8 +8,6 @@ import { EditOutlined, LockOutlined, UnlockOutlined, DeleteOutlined } from '@ant
 const UserPage = () => {
     const [dataSource, setDataSource] = useState([]);
     const [loading, setLoading] = useState(true);
-    
-    // Lấy thông tin tài khoản đang đăng nhập để không cho phép tự Khóa/Xóa chính mình
     const { auth } = useContext(AuthContext); 
 
     const fetchUser = async () => {
@@ -30,14 +28,14 @@ const UserPage = () => {
         fetchUser();
     }, []);
 
-    // --- 1. Gọi API Cấp / Hạ quyền ---
+    // Gọi API để chỉnh sửa quyền 
     const handleUpdateRole = async (id, currentRole) => {
         const newRole = currentRole === 'ADMIN' ? 'USER' : 'ADMIN';
         try {
             const res = await axios.put(`/v1/api/users/${id}/role`, { role: newRole });
             if (res && res.errCode === 0) {
                 notification.success({ message: "Thành công", description: res.message });
-                fetchUser(); // Tải lại bảng để cập nhật dữ liệu mới
+                fetchUser(); 
             } else {
                 notification.error({ message: "Thao tác thất bại", description: res.message });
             }
@@ -46,7 +44,7 @@ const UserPage = () => {
         }
     };
 
-    // --- 2. Gọi API Khóa / Mở khóa ---
+    // Gọi API Khóa/ Mở khóa tài khoản
     const handleLockUser = async (id) => {
         try {
             const res = await axios.put(`/v1/api/users/${id}/lock`);
@@ -61,7 +59,7 @@ const UserPage = () => {
         }
     };
 
-    // --- 3. Gọi API Xóa ---
+    //Gọi API Xóa 
     const handleDeleteUser = async (id) => {
         try {
             const res = await axios.delete(`/v1/api/users/${id}`);
@@ -76,7 +74,6 @@ const UserPage = () => {
         }
     };
 
-    // Định nghĩa các cột
     const columns = [
         {
             title: <span className="font-bold text-gray-800 text-sm">ID Người dùng</span>,
@@ -120,7 +117,6 @@ const UserPage = () => {
             title: <span className="font-bold text-gray-800 text-sm">Thao tác</span>,
             key: 'action',
             render: (_, record) => {
-                // Ẩn nút thao tác nếu đó là tài khoản của chính Admin đang đăng nhập
                 if (record.email === auth.user.email) {
                     return <span className="text-xs text-gray-400 font-semibold italic bg-gray-100 px-3 py-1.5 rounded-lg">Tài khoản của bạn</span>;
                 }

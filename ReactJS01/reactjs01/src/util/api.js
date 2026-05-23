@@ -22,7 +22,7 @@ const getUserApi = () => {
     const URL_API = "/v1/api/user";
     return axios.get(URL_API)
 }
-// ================= API CHO ADMIN QUẢN LÝ ĐƠN HÀNG =================
+// API cho Admin quản lý đơn hàng
 
 const getOrdersAdminApi = () => {
     const URL_API = "/v1/api/admin/orders";

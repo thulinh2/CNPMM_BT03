@@ -59,7 +59,7 @@ const ProductPage = () => {
         try {
             const priceNumber = parseInt(product.price.replace(/\./g, '').replace('đ', ''));
 
-            // Gửi dữ liệu giỏ hàng (Không cần gửi email vì Backend tự lấy từ Token)
+            // Gửi dữ liệu giỏ hàng 
             const cartData = {
                 productId: product._id,
                 name: product.name,

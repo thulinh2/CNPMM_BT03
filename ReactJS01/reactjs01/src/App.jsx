@@ -1,4 +1,4 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom"; 
 import Header from "./components/layout/header";
 import Footer from "./components/layout/footer";
 import axios from "./util/axios.customize";
@@ -7,7 +7,8 @@ import { AuthContext } from "./components/context/auth.context";
 import { Spin } from "antd";
 
 function App() {
-    const { setAuth, appLoading, setAppLoading } = useContext(AuthContext);
+    const { auth, setAuth, appLoading, setAppLoading } = useContext(AuthContext);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchAccount = async () => {
@@ -18,7 +19,8 @@ function App() {
                     isAuthenticated: true,
                     user: {
                         email: res.email,
-                        name: res.name
+                        name: res.name,
+                        role: res.role 
                     }
                 })
             }
@@ -27,6 +29,12 @@ function App() {
 
         fetchAccount()
     }, [])
+
+    useEffect(() => {
+        if (auth.isAuthenticated && auth.user.role === 'ADMIN') {
+            navigate("/admin");
+        }
+    }, [auth.isAuthenticated, auth.user.role, navigate]);
 
     return (
         <div className="flex flex-col min-h-screen">

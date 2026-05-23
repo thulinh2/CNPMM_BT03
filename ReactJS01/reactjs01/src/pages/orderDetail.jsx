@@ -177,8 +177,6 @@ const OrderDetailPage = () => {
                         </div>
                     )}
                 </div>
-
-                {/* BỐ CỤC CỘT */}
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
                     
                     {/* CỘT TRÁI: SẢN PHẨM & ĐỊA CHỈ */}
@@ -219,15 +217,12 @@ const OrderDetailPage = () => {
                     {/* CỘT PHẢI: HOÁ ĐƠN & LOGIC BUTTON HỦY */}
                     <div className="md:col-span-5 bg-white p-6 rounded-2xl shadow-sm border border-pink-200 flex flex-col gap-5 sticky top-24 box-border">
                         <h3 className="font-bold text-gray-800 text-lg pb-3 border-b border-gray-100">Hóa đơn tóm tắt</h3>
-                        
-                        {/* Đã cập nhật lại khu vực tính tiền hiển thị Voucher */}
                         <div className="flex flex-col gap-3">
                             <div className="flex justify-between items-center text-sm md:text-base text-gray-600 font-medium">
                                 <span>Tổng tiền hàng:</span>
                                 <span className="font-bold text-gray-800">{formatPrice(order.originalAmount || order.totalAmount)}</span>
                             </div>
-                            
-                            {/* Chỉ hiển thị dòng này nếu đơn hàng có giảm giá */}
+
                             {order.discountAmount > 0 && (
                                 <div className="flex justify-between items-center text-sm md:text-base text-green-600 font-semibold">
                                     <span>Giảm giá {order.voucherCode ? `(${order.voucherCode})` : ''}:</span>
@@ -246,7 +241,7 @@ const OrderDetailPage = () => {
                             <span className="text-2xl font-black text-pink-600">{formatPrice(order.totalAmount)}</span>
                         </div>
 
-                        {/* KIỂM TRA ĐIỀU KIỆN HIỂN THỊ BUTTON (Chỉ xuất hiện ở Bước 1, 2, 3) */}
+                        {/* Chỉ xuất hiện button khi ở Bước 1, 2, 3 */}
                         {(order.status === 'New' || order.status === 'Confirmed' || order.status === 'Preparing') && (
                             <div className="mt-2 pt-4 border-t border-gray-100">
                                 
@@ -279,7 +274,7 @@ const OrderDetailPage = () => {
                                     )
                                 )}
 
-                                {/* Kịch bản 3: Đơn đã sang Bước 3 (Đang chuẩn bị) */}
+                                {/* Kịch bản 3: Đơn đã sang Bước 3*/}
                                 {order.status === 'Preparing' && (
                                     <div className="flex flex-col gap-3 animate-fade-in">
                                         <div className="bg-orange-50 text-orange-800 rounded-xl p-3 text-center text-xs font-semibold">

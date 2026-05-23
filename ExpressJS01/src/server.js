@@ -22,8 +22,6 @@ configViewEngine(app);
 const webAPI = express.Router();
 webAPI.get("/", getHomepage);
 app.use('/', webAPI);
-
-//khai báo route cho API
 app.use('/v1/api/', apiRoutes);
 
 (async () => {

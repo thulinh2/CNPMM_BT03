@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 
 const cartSchema = new mongoose.Schema({
-    // Sửa chỗ này: Dùng email thay vì Object ID
     userEmail: {
         type: String,
         required: true

@@ -10,7 +10,7 @@ const adminAuth = (req, res, next) => {
         try {
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
             
-            // CHỐT CHẶN: Kiểm tra xem quyền có phải là ADMIN không
+            // Kiểm tra xem quyền có phải là ADMIN không
             if (decoded.role === "ADMIN") {
                 req.user = {
                     email: decoded.email,

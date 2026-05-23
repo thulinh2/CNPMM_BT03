@@ -43,7 +43,7 @@ const voucherSchema = new mongoose.Schema({
     },
     isActive: { 
         type: Boolean, 
-        default: true // Trạng thái bật/tắt mã
+        default: true 
     }
 }, { timestamps: true });
 

@@ -48,9 +48,9 @@ routerAPI.get("/user", getUser);
 routerAPI.get("/account", delay, getAccount);
 
 routerAPI.post("/cart", addToCart);
-routerAPI.get("/cart", getCart); // Sửa lại route này bỏ cái :userEmail đi cho đồng bộ bảo mật qua token luôn nhé
-routerAPI.put("/cart", updateCartQuantity); // API cập nhật số lượng
-routerAPI.delete("/cart/:productId", deleteCartItem); // API xóa sản phẩm
+routerAPI.get("/cart", getCart); 
+routerAPI.put("/cart", updateCartQuantity); 
+routerAPI.delete("/cart/:productId", deleteCartItem); 
 
 routerAPI.post("/order", placeOrder);
 routerAPI.get("/orders", getUserOrders);    
@@ -58,11 +58,11 @@ routerAPI.get("/order/:id", getOrderDetail);
 routerAPI.put("/order/:id/cancel", cancelOrder);
 routerAPI.post("/voucher/check", checkVoucher);
 
-// --- CÁC ROUTE CHỈ DÀNH CHO ADMIN QUẢN LÝ USER ---
+// Dành cho Admin quản lý user
 routerAPI.put("/users/:id/role", adminAuth, updateRole);
 routerAPI.put("/users/:id/lock", adminAuth, toggleLockUser);
 routerAPI.delete("/users/:id", adminAuth, deleteUser);
-// --- CÁC ROUTE CHỈ DÀNH CHO ADMIN QUẢN LÝ ĐƠN HÀNG ---
+// Dành cho Admin quản lý đơn hàng
 routerAPI.get("/admin/orders", adminAuth, getAllOrdersAdmin);
 routerAPI.put("/admin/orders/:id/status", adminAuth, updateOrderStatus);
 routerAPI.put("/admin/orders/:id/cancel-request", adminAuth, handleCancelRequest);

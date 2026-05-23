@@ -58,7 +58,6 @@ const AdminOrdersPage = () => {
         return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')} - ${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
     };
 
-    // Hàm render trạng thái có màu sắc
     const renderStatus = (record) => {
         const { status, cancelReason } = record;
         const statusConfig = {
@@ -94,7 +93,7 @@ const AdminOrdersPage = () => {
         { 
             title: 'Trạng thái', 
             render: (_, record) => renderStatus(record),
-            // Thêm các thuộc tính lọc ở đây:
+            // Thêm các thuộc tính lọc 
             filters: [
                 { text: 'Đơn mới', value: 'New' },
                 { text: 'Đã xác nhận', value: 'Confirmed' },

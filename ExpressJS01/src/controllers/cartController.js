@@ -1,6 +1,6 @@
 const Cart = require('../models/cart');
 
-// 1. Hàm thêm sản phẩm vào giỏ hàng (Đã hoàn thiện ở bước trước)
+// thêm sản phẩm vào giỏ hàng 
 const addToCart = async (req, res) => {
     try {
         const userEmail = req.user.email; 
@@ -28,10 +28,10 @@ const addToCart = async (req, res) => {
     }
 };
 
-// 2. Hàm lấy thông tin giỏ hàng dựa theo Token đăng nhập
+// lấy thông tin giỏ hàng dựa theo Token đăng nhập
 const getCart = async (req, res) => {
     try {
-        const userEmail = req.user.email; // Lấy trực tiếp từ token giải mã cho an toàn
+        const userEmail = req.user.email; 
         const cart = await Cart.findOne({ userEmail });
         return res.status(200).json({
             errCode: 0,
@@ -42,7 +42,7 @@ const getCart = async (req, res) => {
     }
 };
 
-// 3. HÀM MỚI: Cập nhật số lượng sản phẩm trong giỏ hàng
+// Cập nhật số lượng sản phẩm trong giỏ hàng
 const updateCartQuantity = async (req, res) => {
     try {
         const userEmail = req.user.email;
@@ -64,11 +64,11 @@ const updateCartQuantity = async (req, res) => {
     }
 };
 
-// 4. HÀM MỚI: Xóa hẳn một sản phẩm ra khỏi giỏ hàng
+// Xóa hẳn một sản phẩm ra khỏi giỏ hàng
 const deleteCartItem = async (req, res) => {
     try {
         const userEmail = req.user.email;
-        const { productId } = req.params; // Nhận mã sản phẩm cần xóa trên đường dẫn url
+        const { productId } = req.params; 
 
         let cart = await Cart.findOne({ userEmail });
         if (!cart) return res.status(404).json({ errCode: 1, message: 'Không tìm thấy giỏ hàng' });

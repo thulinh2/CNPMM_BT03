@@ -35,7 +35,6 @@ const OrdersPage = () => {
         return num?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "đ";
     };
 
-    // Hàm chuyển đổi tiếng Anh sang tiếng Việt và gán màu sắc cho từng Trạng thái
     const getStatusDisplay = (status) => {
         switch(status) {
             case 'New': return { text: 'Chờ xác nhận', style: 'text-blue-600 bg-blue-50 border-blue-100' };
@@ -49,16 +48,14 @@ const OrdersPage = () => {
         }
     };
 
-    // Lọc đơn hàng theo Tab đang chọn
+    // Lọc đơn hàng 
     const filteredOrders = activeTab === 'All' 
         ? orders 
         : orders.filter(o => {
-            // Gom chung "Cancel_Requested" vào tab "Đã hủy" cho gọn UI
             if (activeTab === 'Cancelled') return o.status === 'Cancelled' || o.status === 'Cancel_Requested';
             return o.status === activeTab;
         });
 
-    // Danh sách các Tab
     const tabs = [
         { key: 'All', label: 'Tất cả' },
         { key: 'New', label: 'Chờ xác nhận' },
@@ -137,8 +134,7 @@ const OrdersPage = () => {
                                                         <p className="text-gray-500 text-sm font-medium mt-1">Số lượng: x{item.quantity}</p>
                                                     </div>
                                                 </div>
-                                                
-                                                {/* Khu vực chứa Giá tiền & Text Link Mua Lại */}
+
                                                 <div className="flex flex-col items-end gap-1.5">
                                                     <span className="text-gray-800 font-semibold text-sm md:text-base whitespace-nowrap">
                                                         {formatPrice(item.price)}
@@ -164,7 +160,6 @@ const OrdersPage = () => {
                                             <span className="text-xl font-black text-pink-600">{formatPrice(order.totalAmount)}</span>
                                         </div>
                                         
-                                        {/* Cập nhật Button "Xem chi tiết" theo chuẩn thiết kế mới */}
                                         <button 
                                             onClick={() => navigate(`/order/${order._id}`)}
                                             className="px-8 py-2.5 bg-pink-600 text-white font-semibold rounded-full hover:bg-pink-500 transition-colors cursor-pointer shadow-sm"

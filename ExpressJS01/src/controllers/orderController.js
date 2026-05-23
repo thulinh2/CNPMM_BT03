@@ -4,7 +4,7 @@ const Product = require('../models/product');
 const User = require('../models/user');
 const Voucher = require('../models/voucher');
 
-// 1. Kiểm tra mã giảm giá (Đã bổ sung ràng buộc 1 tài khoản chỉ dùng 1 lần)
+// Kiểm tra mã giảm giá 
 const checkVoucher = async (req, res) => {
     try {
         const { code, orderValue } = req.body;
@@ -17,7 +17,7 @@ const checkVoucher = async (req, res) => {
             if (user) userId = user._id;
         }
 
-        // RÀNG BUỘC MỚI: Kiểm tra xem tài khoản này đã từng tạo đơn hàng nào sử dụng mã này chưa
+        // Kiểm tra xem tài khoản này đã từng tạo đơn hàng nào sử dụng mã này chưa
         const isVoucherUsed = await Order.findOne({ userId, voucherCode: code.toUpperCase() });
         if (isVoucherUsed) {
             return res.status(400).json({ 
@@ -58,7 +58,7 @@ const checkVoucher = async (req, res) => {
     }
 };
 
-// 2. Đặt hàng (Có bảo mật double-check tránh bypass mã)
+// Đặt hàng 
 const placeOrder = async (req, res) => {
     try {
         const { shippingInfo, paymentMethod, voucherCode } = req.body;
@@ -76,7 +76,7 @@ const placeOrder = async (req, res) => {
             userId = user._id;
         }
 
-        // DOUBLE-CHECK BẢO MẬT: Kiểm tra lại xem tài khoản đã dùng mã này trước đó chưa khi gửi lệnh tạo đơn
+        // Kiểm tra lại xem tài khoản đã dùng mã này trước đó chưa khi gửi lệnh tạo đơn
         if (voucherCode) {
             const isVoucherUsed = await Order.findOne({ userId, voucherCode: voucherCode.toUpperCase() });
             if (isVoucherUsed) {
@@ -159,7 +159,7 @@ const placeOrder = async (req, res) => {
     }
 };
 
-// 3. Lấy danh sách lịch sử đơn hàng
+// Lấy danh sách lịch sử đơn hàng
 const getUserOrders = async (req, res) => {
     try {
         const userEmail = req.user.email;
@@ -175,7 +175,7 @@ const getUserOrders = async (req, res) => {
     }
 };
 
-// 4. Lấy chi tiết đơn hàng
+// Lấy chi tiết đơn hàng
 const getOrderDetail = async (req, res) => {
     try {
         const order = await Order.findById(req.params.id);
@@ -186,8 +186,7 @@ const getOrderDetail = async (req, res) => {
     }
 };
 
-// 5. Hủy đơn hàng (Đã loại bỏ cơ chế trả lại voucher khi đơn bị hủy)
-// 5. Hủy đơn hàng (Đã sửa lại logic thời gian 30 phút)
+// Hủy đơn hàng 
 const cancelOrder = async (req, res) => {
     try {
         const orderId = req.params.id;
@@ -197,10 +196,8 @@ const cancelOrder = async (req, res) => {
 
         const diffInMinutes = (new Date() - new Date(order.createdAt)) / (1000 * 60);
 
-        // Trường hợp 1: Khách tự hủy trực tiếp (Chỉ áp dụng khi đơn Mới / Đã xác nhận)
+        //Khách tự hủy trực tiếp (Chỉ áp dụng khi đơn Mới / Đã xác nhận)
         if (order.status === 'New' || order.status === 'Confirmed') {
-            
-            // CHỐT CHẶN: Chỉ ở trường hợp tự hủy này mới bị ràng buộc 30 phút
             if (diffInMinutes > 30) {
                 return res.status(400).json({ 
                     errCode: 1, 
@@ -221,7 +218,7 @@ const cancelOrder = async (req, res) => {
             return res.status(200).json({ errCode: 0, message: "Hủy đơn hàng thành công!", data: order });
             
         } 
-        // Trường hợp 2: Khách GỬI YÊU CẦU hủy (Áp dụng khi shop đang đóng gói - Bỏ qua thời gian 30p)
+        // Khách gửi yêu cầu hủy (Áp dụng khi shop đang đóng gói - Bỏ qua thời gian 30p)
         else if (order.status === 'Preparing') {
             order.status = 'Cancel_Requested';
             order.cancelReason = cancelReason || 'Khách hàng yêu cầu hủy';
@@ -231,7 +228,7 @@ const cancelOrder = async (req, res) => {
             return res.status(200).json({ errCode: 0, message: "Đã gửi yêu cầu hủy đơn thành công!", data: order });
             
         } 
-        // Trường hợp 3: Đang giao hoặc đã giao thì cấm hủy
+        // Đang giao hoặc đã giao thì cấm hủy
         else {
             return res.status(400).json({ errCode: 1, message: "Đơn hàng đang giao, không thể hủy." });
         }
@@ -239,13 +236,13 @@ const cancelOrder = async (req, res) => {
         return res.status(500).json({ errCode: -1, message: "Lỗi Server" });
     }
 };
-// ================= CÁC HÀM DÀNH CHO ADMIN QUẢN LÝ ĐƠN HÀNG =================
+// Các hàm dành cho Admin quản lý đơn hàng
 
-// 6. Lấy toàn bộ danh sách đơn hàng cho Admin
+// Lấy toàn bộ danh sách đơn hàng
 const getAllOrdersAdmin = async (req, res) => {
     try {
         const orders = await Order.find()
-            .populate('userId', 'name email') // Lấy thêm tên và email khách hàng để hiển thị
+            .populate('userId', 'name email') 
             .sort({ createdAt: -1 });
         return res.status(200).json({ errCode: 0, data: orders });
     } catch (error) {
@@ -254,7 +251,7 @@ const getAllOrdersAdmin = async (req, res) => {
     }
 };
 
-// 7. Cập nhật trạng thái đơn hàng (Tiến trình 6 bước)
+// Cập nhật trạng thái đơn hàng 
 const updateOrderStatus = async (req, res) => {
     try {
         const { id } = req.params;
@@ -262,8 +259,6 @@ const updateOrderStatus = async (req, res) => {
         
         const order = await Order.findById(id);
         if (!order) return res.status(404).json({ errCode: 1, message: "Không tìm thấy đơn hàng!" });
-
-        // Nếu Admin chủ động chuyển đơn sang Hủy (Cancelled) từ các trạng thái khác
         if (status === 'Cancelled' && order.status !== 'Cancelled' && order.status !== 'Cancel_Requested') {
             for (const item of order.items) {
                 await Product.findByIdAndUpdate(item.productId, { $inc: { stock: item.quantity, sold: -item.quantity } });
@@ -280,11 +275,11 @@ const updateOrderStatus = async (req, res) => {
     }
 };
 
-// 8. Xử lý yêu cầu hủy đơn từ khách hàng (khi đơn đang ở Preparing)
+// Xử lý yêu cầu hủy đơn từ khách hàng
 const handleCancelRequest = async (req, res) => {
     try {
         const { id } = req.params;
-        const { isApproved, note } = req.body; // isApproved nhận true (Đồng ý) hoặc false (Từ chối)
+        const { isApproved, note } = req.body; 
 
         const order = await Order.findById(id);
         if (!order) return res.status(404).json({ errCode: 1, message: "Không tìm thấy đơn hàng!" });
@@ -294,7 +289,6 @@ const handleCancelRequest = async (req, res) => {
         }
 
         if (isApproved) {
-            // Admin đồng ý hủy: Chuyển sang Cancelled và hoàn lại kho
             order.status = 'Cancelled';
             order.statusHistory.push({ status: 'Cancelled', note: note || 'Shop đã đồng ý yêu cầu hủy đơn' });
             
@@ -302,7 +296,6 @@ const handleCancelRequest = async (req, res) => {
                 await Product.findByIdAndUpdate(item.productId, { $inc: { stock: item.quantity, sold: -item.quantity } });
             }
         } else {
-            // Admin từ chối hủy: Quay lại trạng thái Shop đang chuẩn bị hàng
             order.status = 'Preparing';
             order.cancelReason = ''; 
             order.statusHistory.push({ status: 'Preparing', note: note || 'Shop từ chối hủy, đơn hàng đang được đóng gói' });

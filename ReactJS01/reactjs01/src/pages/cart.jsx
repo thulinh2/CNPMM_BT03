@@ -8,7 +8,7 @@ const CartPage = () => {
     const [cartItems, setCartItems] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    // 1. Gọi API lấy thông tin giỏ hàng khi vừa mở trang
+    // Gọi API lấy thông tin giỏ hàng khi vừa mở trang
     const fetchCartData = async () => {
         setLoading(true);
         try {
@@ -28,7 +28,7 @@ const CartPage = () => {
         }
     }, [auth]);
 
-    // 2. Xử lý tăng/giảm số lượng món đồ
+    // Xử lý tăng/giảm số lượng sp
     const handleUpdateQuantity = async (productId, currentQty, action) => {
         let newQty = action === 'increase' ? currentQty + 1 : currentQty - 1;
         
@@ -46,7 +46,7 @@ const CartPage = () => {
         }
     };
 
-    // 3. Xử lý xóa sản phẩm ra khỏi giỏ
+    // Xử lý xóa sản phẩm ra khỏi giỏ
     const handleDeleteItem = async (productId) => {
         if (window.confirm("Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?")) {
             try {
@@ -60,7 +60,7 @@ const CartPage = () => {
         }
     };
 
-    // 4. Hàm tự động tính tổng tiền
+    // Hàm tự động tính tổng tiền
     const calculateTotal = () => {
         return cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     };
@@ -73,7 +73,7 @@ const CartPage = () => {
         return (
             <div className="text-center py-20 bg-rose-50/30 min-h-screen flex flex-col justify-center items-center gap-4">
                 <p className="text-gray-500 font-medium text-lg">Vui lòng đăng nhập để xem giỏ hàng của bạn!</p>
-                <Link to="/login" className="bg-pink-600 text-white font-bold py-2.5 px-6 rounded-xl hover:bg-pink-700 transition">Đăng Nhập Ngay</Link>
+                <Link to="/login" className="text-pink-600 font-bold hover:underline">Đăng Nhập Ngay</Link>
             </div>
         );
     }
@@ -92,8 +92,8 @@ const CartPage = () => {
                 {cartItems.length === 0 ? (
                     <div className="bg-white rounded-2xl shadow-sm border border-pink-100 p-12 text-center flex flex-col items-center gap-5">
                         <div className="text-gray-300 text-6xl">🛒</div>
-                        <p className="text-gray-500 font-medium text-lg">Giỏ hàng của bạn đang trống rỗng.</p>
-                        <Link to="/" className="bg-pink-600 text-white font-bold py-3 px-8 rounded-xl hover:bg-pink-700 transition shadow-md shadow-pink-100">
+                        <p className="text-gray-500 font-medium text-lg">Giỏ hàng của bạn đang trống.</p>
+                        <Link to="/" className="text-pink-600 font-bold hover:underline">
                             Tiếp Tục Mua Sắm
                         </Link>
                     </div>
@@ -103,8 +103,6 @@ const CartPage = () => {
                         <div className="w-full lg:w-2/3 flex flex-col gap-4">
                             {cartItems.map((item) => (
                                 <div key={item.productId} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4 group transition-all duration-300 hover:shadow-md">
-                                    
-                                    {/* 1. ĐÃ BỌC LINK VÀO HÌNH ẢNH SẢN PHẨM */}
                                     <Link 
                                         to={`/product/${item.productId}`} 
                                         className="w-20 h-20 bg-gray-50 rounded-lg overflow-hidden flex-shrink-0 border border-gray-100 block hover:opacity-80 transition-opacity"
@@ -113,7 +111,6 @@ const CartPage = () => {
                                     </Link>
                                     
                                     <div className="flex-1 min-w-0">
-                                        {/* 2. ĐÃ BỌC LINK VÀO TÊN SẢN PHẨM */}
                                         <Link to={`/product/${item.productId}`} className="block w-max max-w-full">
                                             <h3 className="font-bold text-gray-800 truncate text-base mb-1 hover:text-pink-600 transition-colors">
                                                 {item.name}
@@ -162,7 +159,7 @@ const CartPage = () => {
                             ))}
                         </div>
 
-                        {/* KHUNG TỔNG TIỀN (Giữ nguyên y hệt file bạn cung cấp) */}
+                        {/* KHUNG TỔNG TIỀN */}
                         <div className="w-full lg:w-[35%] bg-white px-6 py-8 rounded-2xl shadow-sm border border-pink-200 flex flex-col gap-6 sticky top-24 box-border">
                             
                             <h3 className="text-xl font-bold text-gray-800 pb-4 border-b border-gray-100">

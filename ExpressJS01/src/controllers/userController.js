@@ -24,7 +24,7 @@ const getAccount = async (req, res) => {
     return res.status(200).json(req.user);
 }
 
-// ================= CÁC HÀM MỚI CHO ADMIN =================
+// Các hàm cho Admin
 
 const updateRole = async (req, res) => {
     const { id } = req.params;

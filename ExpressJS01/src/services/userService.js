@@ -18,7 +18,7 @@ const createUserService = async (name, email, password) => {
             email: email,
             password: hashPassword,
             role: "USER",
-            isActive: true // Mặc định tạo mới là được hoạt động
+            isActive: true 
         })
         return result;
     } catch (error) {
@@ -31,7 +31,7 @@ const loginService = async (email1, password) => {
     try {
         const user = await User.findOne({ email: email1 });
         if (user) {
-            // CHỐT CHẶN: Kiểm tra xem tài khoản có đang bị khóa không
+            // Kiểm tra xem tài khoản có đang bị khóa không
             if (user.isActive === false) {
                 return {
                     EC: 3,
@@ -65,7 +65,7 @@ const getUserService = async () => {
     } catch (error) { console.log(error); return null; }
 }
 
-// ================= CÁC HÀM MỚI CHO ADMIN =================
+// Hàm dành cho Admin
 
 const updateRoleService = async (userId, newRole) => {
     try {

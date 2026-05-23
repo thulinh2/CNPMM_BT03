@@ -22,7 +22,7 @@ import { AuthWrapper } from './components/context/auth.context.jsx';
 
 const router = createBrowserRouter([
     {
-        // KHỐI GIAO DIỆN DÀNH CHO KHÁCH HÀNG (Đã xóa trang User khỏi đây)
+        // KHỐI GIAO DIỆN DÀNH CHO KHÁCH HÀNG 
         path: "/",
         element: <App />,
         children: [
@@ -70,7 +70,6 @@ const router = createBrowserRouter([
                 element: <AdminOrdersPage />
             },
             {
-                // ĐÃ GẮN GIAO DIỆN QUẢN LÝ NGƯỜI DÙNG VÀO ĐÂY
                 path: "users",
                 element: <UserPage /> 
             }

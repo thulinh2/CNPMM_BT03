@@ -9,12 +9,8 @@ const CheckoutPage = () => {
     const navigate = useNavigate();
     const [cartItems, setCartItems] = useState([]);
     const [loading, setLoading] = useState(true);
-    
-    // 1. Thêm State quản lý Voucher
     const [voucherInput, setVoucherInput] = useState('');
     const [appliedVoucher, setAppliedVoucher] = useState({ code: '', discountAmount: 0 });
-    
-    // State lưu thông tin giao hàng
     const [shippingInfo, setShippingInfo] = useState({
         fullName: auth?.user?.name || '',
         phone: '',
@@ -44,8 +40,6 @@ const CheckoutPage = () => {
         }
         setLoading(false);
     };
-
-    // 2. Tách hàm tính Tạm tính và Tổng thanh toán cuối cùng
     const calculateSubTotal = () => {
         return cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     };
@@ -53,7 +47,7 @@ const CheckoutPage = () => {
     const calculateFinalTotal = () => {
         const subTotal = calculateSubTotal();
         const final = subTotal - appliedVoucher.discountAmount;
-        return final > 0 ? final : 0; // Không để tổng tiền bị âm
+        return final > 0 ? final : 0; 
     };
 
     const formatPrice = (num) => {
@@ -65,7 +59,6 @@ const CheckoutPage = () => {
         setShippingInfo({ ...shippingInfo, [name]: value });
     };
 
-    // 3. Hàm xử lý nút "Áp dụng" mã giảm giá
     const handleApplyVoucher = async () => {
         if (!voucherInput.trim()) {
             notification.warning({ message: "Thiếu thông tin", description: "Vui lòng nhập mã giảm giá!" });
@@ -104,7 +97,7 @@ const CheckoutPage = () => {
         setAppliedVoucher({ code: '', discountAmount: 0 });
     };
 
-    // 4. Xử lý khi bấm nút Đặt hàng (Kẹp thêm voucherCode)
+    // Xử lý khi bấm nút Đặt hàng 
     const handlePlaceOrder = async (e) => {
         e.preventDefault();
         
@@ -120,7 +113,7 @@ const CheckoutPage = () => {
             const orderData = {
                 shippingInfo,
                 paymentMethod: 'COD',
-                voucherCode: appliedVoucher.code // Gửi kèm mã Voucher xuống Backend
+                voucherCode: appliedVoucher.code 
             };
             
             const res = await axios.post('/v1/api/order', orderData);
@@ -130,7 +123,7 @@ const CheckoutPage = () => {
                     message: "Đặt hàng thành công!",
                     description: "Đơn hàng của bạn sẽ được thanh toán khi nhận hàng (COD)."
                 });
-                navigate('/orders'); // Cập nhật: Đặt xong chuyển sang trang Lịch sử đơn hàng
+                navigate('/orders'); 
             } else {
                 notification.error({
                     message: "Lỗi đặt hàng",
@@ -156,7 +149,7 @@ const CheckoutPage = () => {
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
                     
-                    {/* CỘT TRÁI: FORM ĐIỀN THÔNG TIN */}
+                    {/* FORM ĐIỀN THÔNG TIN */}
                     <div className="lg:col-span-7 bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
                         <h3 className="text-lg font-bold text-gray-800 mb-6 pb-3 border-b border-gray-100">Thông tin nhận hàng</h3>
                         
@@ -208,7 +201,7 @@ const CheckoutPage = () => {
                         </form>
                     </div>
 
-                    {/* CỘT PHẢI: TÓM TẮT ĐƠN HÀNG */}
+                    {/* TÓM TẮT ĐƠN HÀNG */}
                     <div className="lg:col-span-5 bg-white px-6 py-8 rounded-2xl shadow-sm border border-pink-200 flex flex-col gap-6 sticky top-24 box-border">
                         <h3 className="text-xl font-bold text-gray-800 pb-4 border-b border-gray-100">
                             Đơn hàng của bạn
@@ -233,7 +226,7 @@ const CheckoutPage = () => {
                             ))}
                         </div>
 
-                        {/* --- GIAO DIỆN MÃ GIẢM GIÁ --- */}
+                        {/* GIAO DIỆN MÃ GIẢM GIÁ */}
                         <div className="py-4 border-t border-dashed border-gray-200">
                             <label className="block text-sm font-semibold text-gray-800 mb-2">Mã giảm giá / Voucher</label>
                             
@@ -244,7 +237,7 @@ const CheckoutPage = () => {
                                     onChange={(e) => setVoucherInput(e.target.value.toUpperCase())}
                                     placeholder="Ví dụ: GIAM50K hoặc SALE10"
                                     className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-pink-500 font-medium uppercase"
-                                    disabled={appliedVoucher.code !== ''} // Khóa ô nhập nếu đã áp dụng
+                                    disabled={appliedVoucher.code !== ''} 
                                 />
                                 {appliedVoucher.code ? (
                                     <button 
@@ -262,8 +255,6 @@ const CheckoutPage = () => {
                                     </button>
                                 )}
                             </div>
-                            
-                            {/* Thông báo áp dụng thành công */}
                             {appliedVoucher.code && (
                                 <p className="text-green-600 text-sm mt-3 font-semibold flex items-center gap-1.5">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
@@ -274,7 +265,7 @@ const CheckoutPage = () => {
                             )}
                         </div>
 
-                        {/* --- BẢNG TÍNH TIỀN --- */}
+                        {/* BẢNG TÍNH TIỀN */}
                         <div className="border-t border-dashed border-gray-200 pt-4 flex flex-col gap-3">
                             <div className="flex justify-between items-center text-gray-600">
                                 <span>Tạm tính:</span>

@@ -1,6 +1,4 @@
 const mongoose = require('mongoose');
-
-// Tách riêng Schema cho sản phẩm để code gọn gàng, dễ truy vấn
 const orderItemSchema = new mongoose.Schema({
     productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
     name: { type: String, required: true },
@@ -10,10 +8,7 @@ const orderItemSchema = new mongoose.Schema({
 }, { _id: false });
 
 const orderSchema = new mongoose.Schema({
-    // Liên kết với người dùng đã đặt hàng
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-    
-    // Danh sách các món đồ khách đã mua
     items: [orderItemSchema],
     
     // Tổng tiền thanh toán
@@ -28,16 +23,15 @@ const orderSchema = new mongoose.Schema({
         address: { type: String, required: true }
     },
     
-    // Phương thức thanh toán (Hiện tại mặc định là COD)
+    // Phương thức thanh toán (mặc định là COD)
     paymentMethod: { type: String, default: 'COD' },
     isPaid: { type: Boolean, default: false }, 
-    
-    // BỘ TRẠNG THÁI CHUẨN (ORDER LIFECYCLE)
+
     status: { 
         type: String, 
         enum: [
-            'New',               // 1. Đơn hàng mới (Khách vừa đặt)
-            'Confirmed',         // 2. Đã xác nhận (Shop duyệt thủ công)
+            'New',               // 1. Đơn hàng mới 
+            'Confirmed',         // 2. Đã xác nhận 
             'Preparing',         // 3. Shop đang chuẩn bị hàng
             'Delivering',        // 4. Đang giao hàng
             'Delivered',         // 5. Đã giao thành công
@@ -46,11 +40,7 @@ const orderSchema = new mongoose.Schema({
         ],
         default: 'New' 
     },
-    
-    // Lưu lại lý do hủy đơn nếu có
     cancelReason: { type: String, default: '' }, 
-    
-    // Lịch sử lưu vết các thay đổi trạng thái để làm tính năng Tracking
     statusHistory: [{
         status: { type: String, required: true },
         updatedAt: { type: Date, default: Date.now },

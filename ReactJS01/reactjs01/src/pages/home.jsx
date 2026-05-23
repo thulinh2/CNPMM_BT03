@@ -9,17 +9,12 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 
 const HomePage = () => {
-    // State cho Tất cả sản phẩm
     const [allProducts, setAllProducts] = useState([]);
     const [bestSellers, setBestSellers] = useState([]);
     const [categories, setCategories] = useState([]); 
-    
-    // State cho Lọc và Tìm kiếm
     const [searchName, setSearchName] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('');
     const [selectedPrice, setSelectedPrice] = useState('');
-
-    // State cho Phân trang truyền thống
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(false);
@@ -262,15 +257,14 @@ const HomePage = () => {
                                     ))}
                                 </div>
                                 
-                                {/* THANH PHÂN TRANG TRUYỀN THỐNG BẰNG TAILWIND */}
                                 {totalPages > 1 && (
                                     <div className="flex justify-center items-center gap-2 mt-12">
                                         <button 
                                             onClick={() => handlePageChange(Math.max(page - 1, 1))}
                                             disabled={page === 1}
-                                            className="px-4 py-2 rounded-lg border border-pink-200 text-pink-600 font-semibold hover:bg-pink-50 disabled:opacity-50 disabled:hover:bg-transparent transition-all duration-300"
+                                            className="px-4 py-2 rounded-lg border border-pink-200 text-pink-600 font-semibold hover:bg-pink-50 disabled:opacity-20 disabled:hover:bg-transparent transition-all duration-300"
                                         >
-                                            &laquo; Trước
+                                            &laquo; 
                                         </button>
                                         
                                         {[...Array(totalPages)].map((_, index) => {
@@ -289,9 +283,9 @@ const HomePage = () => {
                                         <button 
                                             onClick={() => handlePageChange(Math.min(page + 1, totalPages))}
                                             disabled={page === totalPages}
-                                            className="px-4 py-2 rounded-lg border border-pink-200 text-pink-600 font-semibold hover:bg-pink-50 disabled:opacity-50 disabled:hover:bg-transparent transition-all duration-300"
+                                            className="px-4 py-2 rounded-lg border border-pink-200 text-pink-600 font-semibold hover:bg-pink-50 disabled:opacity-20 disabled:hover:bg-transparent transition-all duration-300"
                                         >
-                                            Sau &raquo;
+                                             &raquo;
                                         </button>
                                     </div>
                                 )}

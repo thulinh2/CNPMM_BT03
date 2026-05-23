@@ -15,7 +15,7 @@ const auth = (req, res, next) => {
                 req.user = {
                     email: decoded.email,
                     name: decoded.name,
-                    role: decoded.role, // THÊM DÒNG NÀY: Lấy role từ token
+                    role: decoded.role, // Lấy role từ token
                     createdBy: "hoidanit"
                 }
                 console.log(">>> check token: ", decoded)
