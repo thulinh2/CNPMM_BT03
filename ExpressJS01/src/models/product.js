@@ -3,11 +3,12 @@ const mongoose = require('mongoose');
 const productSchema = new mongoose.Schema({
     name: String,
     price: String, 
-    img: String, // Ảnh chính hiển thị ở trang chủ
-    images: [String], // Danh sách nhiều ảnh trong trang chi tiết
+    img: String, 
+    images: [String], 
     category: String,
     isNewProduct: { type: Boolean, default: false },
     isBestSeller: { type: Boolean, default: false },
+    discount: { type: Number, default: 0 }, // THÊM DÒNG NÀY: Mức giảm giá (Ví dụ: 30 là giảm 30%)
     stock: { type: Number, default: 50 }, 
     sold: { type: Number, default: 0 },   
     description: String 

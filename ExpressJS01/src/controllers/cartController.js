@@ -4,7 +4,8 @@ const Cart = require('../models/cart');
 const addToCart = async (req, res) => {
     try {
         const userEmail = req.user.email; 
-        const { productId, quantity, name, price, img } = req.body;
+        // Bổ sung originalPrice và discount vào để lấy từ Frontend
+        const { productId, quantity, name, price, img, originalPrice, discount } = req.body;
 
         let cart = await Cart.findOne({ userEmail });
 
@@ -12,14 +13,20 @@ const addToCart = async (req, res) => {
             const itemIndex = cart.items.findIndex(p => p.productId.toString() === productId);
             if (itemIndex > -1) {
                 cart.items[itemIndex].quantity += quantity;
+                // Cập nhật lại giá gốc và % giảm phòng trường hợp Admin mới thay đổi khuyến mãi
+                cart.items[itemIndex].price = price; 
+                cart.items[itemIndex].originalPrice = originalPrice;
+                cart.items[itemIndex].discount = discount;
             } else {
-                cart.items.push({ productId, name, quantity, price, img });
+                // Thêm sản phẩm mới kèm đầy đủ giá trị
+                cart.items.push({ productId, name, quantity, price, img, originalPrice, discount });
             }
             cart = await cart.save();
         } else {
             cart = await Cart.create({
                 userEmail,
-                items: [{ productId, name, quantity, price, img }]
+                // Tạo giỏ hàng mới kèm đầy đủ giá trị
+                items: [{ productId, name, quantity, price, img, originalPrice, discount }]
             });
         }
         return res.status(200).json({ errCode: 0, message: 'Đã thêm vào giỏ hàng', data: cart });

@@ -18,7 +18,9 @@ const cartSchema = new mongoose.Schema({
                 required: true,
                 min: [1, 'Số lượng không được ít hơn 1']
             },
-            price: Number,
+            price: Number, // Giá sau khi giảm (để tính tổng tiền)
+            originalPrice: String, // Thêm trường: Giá gốc (để hiển thị gạch ngang)
+            discount: { type: Number, default: 0 }, // Thêm trường: Phần trăm giảm giá
             img: String
         }
     ]

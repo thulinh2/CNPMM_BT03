@@ -3,11 +3,18 @@ const Product = require('../models/product');
 
 const getProducts = async (req, res) => {
     try {
-        const { name, category, priceRange } = req.query;
+        // Bổ sung thêm biến isSale để nhận yêu cầu từ Frontend
+        const { name, category, priceRange, isNewProduct, isSale } = req.query; 
         let query = {};
 
         if (name) query.name = { $regex: name, $options: 'i' };
         if (category) query.category = category;
+        if (isNewProduct === 'true') query.isNewProduct = true;
+        
+        // THÊM LOGIC: Nếu đang tìm hàng khuyến mãi, lấy sản phẩm có discount lớn hơn 0
+        if (isSale === 'true') {
+            query.discount = { $gt: 0 };
+        }
 
         let products = await Product.find(query);
 
@@ -20,9 +27,10 @@ const getProducts = async (req, res) => {
                 return true;
             });
         }
+        
         // Phân trang
         const page = parseInt(req.query.page) || 1; 
-        const limit = parseInt(req.query.limit) || 6; 
+        const limit = parseInt(req.query.limit) || 8; 
         
         const startIndex = (page - 1) * limit;
         const endIndex = page * limit;

@@ -50,7 +50,11 @@ const Header = () => {
                     <nav className="hidden md:flex items-center gap-8">
                         <NavLink 
                             to="/" 
-                            className={({ isActive }) => isActive ? "text-[20px] text-pink-600 font-bold border-b-2 border-pink-600 py-1" : "text-gray-700 hover:text-pink-600 font-semibold py-1 transition-colors"}
+                            // Đã sửa class inactive để giữ nguyên text-[20px] và font-bold
+                            className={({ isActive }) => isActive 
+                                ? "text-[20px] text-pink-600 font-bold border-b-2 border-pink-600 py-1" 
+                                : "text-[20px] text-gray-700 hover:text-pink-600 font-bold py-1 transition-colors"
+                            }
                         >
                             Trang Chủ
                         </NavLink>

@@ -18,6 +18,7 @@ import OrderDetailPage from './pages/orderDetail.jsx';
 import AdminLayout from './components/layout/adminLayout';
 import CheckoutPage from './pages/checkout.jsx';
 import AdminOrdersPage from './pages/adminOrders.jsx';
+import CollectionPage from './pages/collection.jsx';
 import { AuthWrapper } from './components/context/auth.context.jsx';
 
 const router = createBrowserRouter([
@@ -29,6 +30,10 @@ const router = createBrowserRouter([
             {
                 index: true,
                 element: <HomePage />
+            },
+            {
+                path: "collection",
+                element: <CollectionPage />
             },
             {
                 path: "product/:id",

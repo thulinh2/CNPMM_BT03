@@ -40,6 +40,8 @@ const CheckoutPage = () => {
         }
         setLoading(false);
     };
+    
+    // TÍNH TOÁN DỰA TRÊN MỨC GIÁ ĐÃ GIẢM
     const calculateSubTotal = () => {
         return cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     };
@@ -68,7 +70,7 @@ const CheckoutPage = () => {
         try {
             const res = await axios.post('/v1/api/voucher/check', {
                 code: voucherInput,
-                orderValue: calculateSubTotal() // Gửi tổng tiền lên để kiểm tra xem có đủ điều kiện áp dụng không
+                orderValue: calculateSubTotal()
             });
             
             if (res && res.errCode === 0) {
@@ -79,7 +81,6 @@ const CheckoutPage = () => {
                 });
             } else {
                 notification.error({ message: "Lỗi mã giảm giá", description: res.message });
-                // Reset nếu mã sai
                 setAppliedVoucher({ code: '', discountAmount: 0 });
             }
         } catch (error) {
@@ -91,13 +92,11 @@ const CheckoutPage = () => {
         }
     };
 
-    // Hủy bỏ mã đã áp dụng
     const handleRemoveVoucher = () => {
         setVoucherInput('');
         setAppliedVoucher({ code: '', discountAmount: 0 });
     };
 
-    // Xử lý khi bấm nút Đặt hàng 
     const handlePlaceOrder = async (e) => {
         e.preventDefault();
         
@@ -149,7 +148,6 @@ const CheckoutPage = () => {
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
                     
-                    {/* FORM ĐIỀN THÔNG TIN */}
                     <div className="lg:col-span-7 bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
                         <h3 className="text-lg font-bold text-gray-800 mb-6 pb-3 border-b border-gray-100">Thông tin nhận hàng</h3>
                         
@@ -201,7 +199,6 @@ const CheckoutPage = () => {
                         </form>
                     </div>
 
-                    {/* TÓM TẮT ĐƠN HÀNG */}
                     <div className="lg:col-span-5 bg-white px-6 py-8 rounded-2xl shadow-sm border border-pink-200 flex flex-col gap-6 sticky top-24 box-border">
                         <h3 className="text-xl font-bold text-gray-800 pb-4 border-b border-gray-100">
                             Đơn hàng của bạn
@@ -219,14 +216,22 @@ const CheckoutPage = () => {
                                             <p className="text-xs text-gray-500 font-medium">Số lượng: {item.quantity}</p>
                                         </div>
                                     </div>
-                                    <span className="text-sm font-bold text-pink-600 whitespace-nowrap">
-                                        {formatPrice(item.price * item.quantity)}
-                                    </span>
+                                    
+                                    {/* HIỂN THỊ ĐỒNG BỘ GIÁ ĐỎ / GIÁ GỐC THEO SỐ LƯỢNG MUA */}
+                                    <div className="flex flex-col items-end">
+                                        <span className={`text-sm font-bold whitespace-nowrap ${item.discount > 0 ? 'text-red-500' : 'text-pink-600'}`}>
+                                            {formatPrice(item.price * item.quantity)}
+                                        </span>
+                                        {item.discount > 0 && item.originalPrice && (
+                                            <span className="text-xs text-slate-400 line-through">
+                                                {formatPrice(parseInt(item.originalPrice.replace(/\./g, '').replace('đ', '').trim()) * item.quantity)}
+                                            </span>
+                                        )}
+                                    </div>
                                 </div>
                             ))}
                         </div>
 
-                        {/* GIAO DIỆN MÃ GIẢM GIÁ */}
                         <div className="py-4 border-t border-dashed border-gray-200">
                             <label className="block text-sm font-semibold text-gray-800 mb-2">Mã giảm giá / Voucher</label>
                             
@@ -265,7 +270,6 @@ const CheckoutPage = () => {
                             )}
                         </div>
 
-                        {/* BẢNG TÍNH TIỀN */}
                         <div className="border-t border-dashed border-gray-200 pt-4 flex flex-col gap-3">
                             <div className="flex justify-between items-center text-gray-600">
                                 <span>Tạm tính:</span>

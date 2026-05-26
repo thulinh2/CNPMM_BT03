@@ -8,7 +8,6 @@ const CartPage = () => {
     const [cartItems, setCartItems] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    // Gọi API lấy thông tin giỏ hàng khi vừa mở trang
     const fetchCartData = async () => {
         setLoading(true);
         try {
@@ -28,10 +27,8 @@ const CartPage = () => {
         }
     }, [auth]);
 
-    // Xử lý tăng/giảm số lượng sp
     const handleUpdateQuantity = async (productId, currentQty, action) => {
         let newQty = action === 'increase' ? currentQty + 1 : currentQty - 1;
-        
         if (newQty < 1) return; 
 
         try {
@@ -46,7 +43,6 @@ const CartPage = () => {
         }
     };
 
-    // Xử lý xóa sản phẩm ra khỏi giỏ
     const handleDeleteItem = async (productId) => {
         if (window.confirm("Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?")) {
             try {
@@ -60,7 +56,6 @@ const CartPage = () => {
         }
     };
 
-    // Hàm tự động tính tổng tiền
     const calculateTotal = () => {
         return cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     };
@@ -102,7 +97,7 @@ const CartPage = () => {
                         {/* DANH SÁCH MÓN ĐỒ */}
                         <div className="w-full lg:w-2/3 flex flex-col gap-4">
                             {cartItems.map((item) => (
-                                <div key={item.productId} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4 group transition-all duration-300 hover:shadow-md">
+                                <div key={item.productId} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4 group transition-all duration-300 hover:shadow-md relative">
                                     <Link 
                                         to={`/product/${item.productId}`} 
                                         className="w-20 h-20 bg-gray-50 rounded-lg overflow-hidden flex-shrink-0 border border-gray-100 block hover:opacity-80 transition-opacity"
@@ -116,7 +111,16 @@ const CartPage = () => {
                                                 {item.name}
                                             </h3>
                                         </Link>
-                                        <p className="text-pink-600 font-bold text-sm">{formatPrice(item.price)}</p>
+
+                                        {/* HIỂN THỊ ĐỒNG BỘ GIÁ ĐỎ / GIÁ GỐC */}
+                                        {item.discount > 0 && item.originalPrice ? (
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-red-500 font-bold text-sm">{formatPrice(item.price)}</span>
+                                                <span className="text-slate-400 line-through text-xs">{item.originalPrice}</span>
+                                            </div>
+                                        ) : (
+                                            <p className="text-pink-600 font-bold text-sm">{formatPrice(item.price)}</p>
+                                        )}
                                     </div>
 
                                     {/* Nút bấm tăng giảm số lượng */}
@@ -125,7 +129,6 @@ const CartPage = () => {
                                             onClick={() => handleUpdateQuantity(item.productId, item.quantity, 'decrease')}
                                             className="px-3 py-2 hover:bg-gray-100 text-gray-500 transition"
                                         >
-                                            {/* SVG Icon Trừ */}
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-3.5 h-3.5">
                                               <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 12h-15" />
                                             </svg>
@@ -137,20 +140,17 @@ const CartPage = () => {
                                             onClick={() => handleUpdateQuantity(item.productId, item.quantity, 'increase')}
                                             className="px-3 py-2 hover:bg-gray-100 text-gray-500 transition"
                                         >
-                                            {/* SVG Icon Cộng */}
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-3.5 h-3.5">
                                               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                                             </svg>
                                         </button>
                                     </div>
 
-                                    {/* Nút xóa món đồ */}
                                     <button 
                                         onClick={() => handleDeleteItem(item.productId)}
                                         className="text-gray-400 hover:text-red-500 p-2.5 rounded-lg hover:bg-red-50 transition duration-300 flex-shrink-0 ml-2"
                                         title="Xóa khỏi giỏ"
                                     >
-                                        {/* SVG Icon Thùng Rác */}
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
                                           <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
                                         </svg>
