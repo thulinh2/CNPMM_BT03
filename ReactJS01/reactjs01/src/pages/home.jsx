@@ -174,7 +174,7 @@ const HomePage = () => {
             {/* 1. BANNER CHÍNH */}
             <div className="bg-pink-600 text-white text-center py-16 px-4">
                 <h1 className="text-4xl font-bold mb-4">Bộ Sưu Tập Túi Xách Mùa Mới!</h1>
-                <p className="text-xl mb-8">Tự tin tỏa sáng. Giảm ngay 30% cho các mẫu ví kẹp nách và ví cầm tay.</p>
+                <p className="text-xl mb-8">Tự tin tỏa sáng. Giảm ngay 10%.</p>
                 <Link 
                     to="/collection"
                     className="inline-block bg-white text-pink-600 font-semibold py-2 px-6 rounded-full hover:bg-gray-100 transition duration-300 shadow-md"
