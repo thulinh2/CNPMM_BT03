@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { Button, Form, Input, notification } from 'antd';
 import { loginApi } from '../util/api';
 import { Link, useNavigate } from 'react-router-dom';
@@ -8,45 +8,58 @@ import { ArrowLeftOutlined, LockOutlined, UserOutlined } from '@ant-design/icons
 const LoginPage = () => {
     const navigate = useNavigate();
     const { setAuth } = useContext(AuthContext);
+    
+    // STATE MỚI: Thêm loading cho nút Đăng nhập
+    const [loading, setLoading] = useState(false);
 
     const onFinish = async (values) => {
         const { email, password } = values;
+        setLoading(true);
 
-        const res = await loginApi(email, password);
+        try {
+            const res = await loginApi(email, password);
 
-        if (res && res.EC === 0) {
-            localStorage.setItem("access_token", res.access_token);
-            notification.success({
-                message: "Đăng nhập thành công",
-                description: "Chào mừng bạn quay trở lại!"
-            });
-            setAuth({
-                isAuthenticated: true,
-                user: {
-                    email: res?.user?.email ?? "",
-                    name: res?.user?.name ?? "",
-                    role: res?.user?.role ?? "USER" 
+            if (res && res.EC === 0) {
+                localStorage.setItem("access_token", res.access_token);
+                notification.success({
+                    message: "Đăng nhập thành công",
+                    description: "Chào mừng bạn quay trở lại!"
+                });
+                setAuth({
+                    isAuthenticated: true,
+                    user: {
+                        email: res?.user?.email ?? "",
+                        name: res?.user?.name ?? "",
+                        role: res?.user?.role ?? "USER" 
+                    }
+                });
+
+                if (res?.user?.role === "ADMIN") {
+                    navigate("/admin");
+                } else {
+                    navigate("/");
                 }
-            });
-
-            if (res?.user?.role === "ADMIN") {
-                navigate("/admin");
+                
             } else {
-                navigate("/");
+                notification.error({
+                    message: "Lỗi đăng nhập",
+                    // Hỗ trợ hiển thị lỗi từ Rate Limit chặn spam
+                    description: res?.EM || res?.response?.data?.EM || "Thông tin không chính xác"
+                });
             }
-            
-        } else {
+        } catch (error) {
             notification.error({
-                message: "Lỗi đăng nhập",
-                description: res?.EM ?? "Thông tin không chính xác"
+                message: "Lỗi hệ thống",
+                description: error?.response?.data?.EM || "Không thể kết nối đến máy chủ."
             });
         }
+        
+        setLoading(false);
     };
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-pink-50 font-sans p-4">
             
-            {/* THẺ CARD - ĐÃ THU GỌN VỀ TỈ LỆ VÀNG 450px VÀ PADDING 40px */}
             <div 
                 className="bg-white shadow-2xl shadow-pink-200/40 border border-pink-100"
                 style={{ width: '100%', maxWidth: '450px', padding: '40px', borderRadius: '24px' }}
@@ -80,7 +93,7 @@ const LoginPage = () => {
                         label={<span className="text-sm font-semibold text-gray-800">Mật khẩu</span>}
                         name="password"
                         rules={[{ required: true, message: 'Vui lòng nhập mật khẩu!' }]}
-                        style={{ marginBottom: '32px' }}
+                        style={{ marginBottom: '12px' }} 
                     >
                         <Input.Password 
                             prefix={<LockOutlined style={{ color: '#f472b6', marginRight: '8px', fontSize: '18px' }} />}
@@ -89,10 +102,18 @@ const LoginPage = () => {
                         />
                     </Form.Item>
 
+                    {/* NÚT QUÊN MẬT KHẨU MỚI THÊM VÀO */}
+                    <div className="flex justify-end mb-6">
+                        <Link to="/forgot-password" className="text-sm font-semibold text-pink-600 hover:text-pink-700 hover:underline transition-colors">
+                            Quên mật khẩu?
+                        </Link>
+                    </div>
+
                     <Form.Item style={{ marginBottom: '24px' }}>
                         <Button 
                             type="primary" 
                             htmlType="submit"
+                            loading={loading}
                             style={{ width: '100%', height: '48px', borderRadius: '12px', fontSize: '16px', fontWeight: 'bold', backgroundColor: '#db2777', border: 'none', boxShadow: '0 4px 10px rgba(244, 114, 182, 0.4)' }}
                         >
                             Đăng Nhập

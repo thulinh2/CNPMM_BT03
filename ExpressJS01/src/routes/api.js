@@ -1,5 +1,6 @@
 const express = require('express');
-const { createUser, handleLogin, getUser, getAccount } = require('../controllers/userController');
+const rateLimit = require('express-rate-limit');
+const { createUser, verifyOtp, resendOtp, handleLogin, forgotPassword, resendForgotPasswordOtp, resetPassword, getUser, getAccount } = require('../controllers/userController');
 const { updateRole, toggleLockUser, deleteUser } = require('../controllers/userController');
 const { getProducts, getProductById, getTopSellers, getCategories } = require('../controllers/productController');
 const { addToCart, getCart, updateCartQuantity, deleteCartItem } = require('../controllers/cartController');
@@ -9,22 +10,51 @@ const adminAuth = require('../middleware/adminAuth');
 const delay = require('../middleware/delay');
 const Product = require('../models/product');
 
+const registerLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, 
+    max: 5, 
+    message: { EC: -1, EM: "Bạn đã thao tác đăng ký quá nhiều lần, vui lòng thử lại sau 15 phút!" }
+});
+
+const resendOtpLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, 
+    max: 3, 
+    message: { EC: -1, EM: "Bạn đã yêu cầu cấp lại mã quá nhiều lần, vui lòng thử lại sau 15 phút!" }
+});
+
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, 
+    max: 5, 
+    message: { EC: -1, EM: "Bạn đã đăng nhập sai quá nhiều lần. Vui lòng thử lại sau 15 phút để bảo vệ tài khoản!" }
+});
+
+const forgotPasswordLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, 
+    max: 3, 
+    message: { EC: -1, EM: "Bạn đã yêu cầu gửi mã quá nhiều lần, vui lòng thử lại sau 15 phút!" }
+});
+
 const routerAPI = express.Router();
 
-// Các route Public
 routerAPI.get("/", (req, res) => {
     return res.status(200).json("Hello world api")
 });
 
-routerAPI.post("/register", createUser);
-routerAPI.post("/login", handleLogin);
+routerAPI.post("/register", registerLimiter, createUser);
+routerAPI.post("/verify-otp", verifyOtp);
+routerAPI.post("/resend-otp", resendOtpLimiter, resendOtp);
+routerAPI.post("/login", loginLimiter, handleLogin);
+
+// ROUTES QUÊN MẬT KHẨU MỚI NÂNG CẤP
+routerAPI.post("/forgot-password", forgotPasswordLimiter, forgotPassword);
+routerAPI.post("/resend-forgot-password-otp", resendOtpLimiter, resendForgotPasswordOtp);
+routerAPI.post("/reset-password", resetPassword);
 
 routerAPI.get("/products", getProducts);
 routerAPI.get("/products/top-sellers", getTopSellers);
 routerAPI.get("/products/:id", getProductById);
 routerAPI.get("/categories", getCategories);
 
-// API tự động tạo dữ liệu mẫu
 routerAPI.get("/seed-products", async (req, res) => {
     try {
         const mockData = [
@@ -33,7 +63,6 @@ routerAPI.get("/seed-products", async (req, res) => {
             { name: 'Túi Đeo Chéo Dạo Phố', price: '650.000đ', img: 'https://images.unsplash.com/photo-1591561954557-26941169b49e?q=80&w=500&auto=format&fit=crop', category: 'Túi Đeo Chéo', isNewProduct: true, isBestSeller: false },
             { name: 'Ví Cầm Tay Dự Tiệc', price: '1.100.000đ', img: 'https://images.unsplash.com/photo-1614179689702-355944cd0918?q=80&w=500&auto=format&fit=crop', category: 'Ví Cầm Tay', isNewProduct: false, isBestSeller: true }
         ];
-        
         await Product.insertMany(mockData); 
         return res.json("Đã tạo collection và thêm dữ liệu thành công!");
     } catch (error) {
@@ -41,9 +70,8 @@ routerAPI.get("/seed-products", async (req, res) => {
     }
 });
 
-routerAPI.use(auth); // Các route nào nằm dưới dòng này đều sẽ bị kiểm tra đăng nhập
+routerAPI.use(auth); 
 
-// Bắt buộc phải đăng nhập
 routerAPI.get("/user", getUser);
 routerAPI.get("/account", delay, getAccount);
 
@@ -58,15 +86,12 @@ routerAPI.get("/order/:id", getOrderDetail);
 routerAPI.put("/order/:id/cancel", cancelOrder);
 routerAPI.post("/voucher/check", checkVoucher);
 
-// Dành cho Admin quản lý user
 routerAPI.put("/users/:id/role", adminAuth, updateRole);
 routerAPI.put("/users/:id/lock", adminAuth, toggleLockUser);
 routerAPI.delete("/users/:id", adminAuth, deleteUser);
-// Dành cho Admin quản lý đơn hàng
+
 routerAPI.get("/admin/orders", adminAuth, getAllOrdersAdmin);
 routerAPI.put("/admin/orders/:id/status", adminAuth, updateOrderStatus);
 routerAPI.put("/admin/orders/:id/cancel-request", adminAuth, handleCancelRequest);
-
-
 
 module.exports = routerAPI;

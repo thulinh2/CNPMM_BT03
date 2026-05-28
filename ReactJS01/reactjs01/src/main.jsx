@@ -19,6 +19,8 @@ import AdminLayout from './components/layout/adminLayout';
 import CheckoutPage from './pages/checkout.jsx';
 import AdminOrdersPage from './pages/adminOrders.jsx';
 import CollectionPage from './pages/collection.jsx';
+// IMPORT THÊM TRANG QUÊN MẬT KHẨU
+import ForgotPasswordPage from './pages/forgotPassword.jsx';
 import { AuthWrapper } from './components/context/auth.context.jsx';
 
 const router = createBrowserRouter([
@@ -64,6 +66,10 @@ const router = createBrowserRouter([
     {
         path: "login",
         element: <LoginPage />
+    },
+    {
+        path: "forgot-password",
+        element: <ForgotPasswordPage />
     },
     {
         // KHỐI GIAO DIỆN DÀNH CHO ADMIN

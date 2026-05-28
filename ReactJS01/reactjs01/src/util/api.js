@@ -8,7 +8,25 @@ const createUserApi = (name, email, password) => {
 
     return axios.post(URL_API, data)
 }
+const verifyOtpApi = (email, otp) => {
+    const URL_API = "/v1/api/verify-otp";
+    const data = { email, otp };
+    return axios.post(URL_API, data); 
+}
+const resendOtpApi = (email) => {
+    const URL_API = "/v1/api/resend-otp";
+    const data = { email };
+    return axios.post(URL_API, data); 
+}
+const forgotPasswordApi = (email) => {
+    const URL_API = "/v1/api/forgot-password";
+    return axios.post(URL_API, { email });
+}
 
+const resetPasswordApi = (email, otp, newPassword) => {
+    const URL_API = "/v1/api/reset-password";
+    return axios.post(URL_API, { email, otp, newPassword });
+}
 const loginApi = (email, password) => {
     const URL_API = "/v1/api/login";
     const data = {
@@ -41,5 +59,6 @@ const handleCancelRequestApi = (orderId, isApproved, note) => {
 
 
 export {
-    createUserApi, loginApi, getUserApi, getOrdersAdminApi, updateOrderStatusApi, handleCancelRequestApi
+    createUserApi, loginApi, getUserApi, getOrdersAdminApi,
+    updateOrderStatusApi, handleCancelRequestApi, verifyOtpApi, resendOtpApi, forgotPasswordApi, resetPasswordApi
 }
